@@ -1,0 +1,38 @@
+My testing strategy relies on a unit testing framework that I created (which
+can be found at <https://github.com/harrybrwn/utest>).
+
+For some tests I used MARS to assemble the text segment of programs into binary
+then used the xxd program to convert them into a header file to be used in
+tests. This process is done with my Makefile but looks something like this,
+
+	$ java -jar Mars4_5.jar a db dump .text Binary tests/s/branch.bin tests/s/branch.s
+	$ xxd -i tests/s/branch.bin tests/branch.bin.h
+
+The output looks like this...
+
+	unsigned char tests_s_branch_bin[] = {
+		0x00, 0x00, 0x09, 0x20, 0x05, 0x00, 0x04, 0x20, 0x00, 0x00, 0x05, 0x20,
+		0x04, 0x00, 0x80, 0x14, 0x01, 0x00, 0x29, 0x21, 0x01, 0x00, 0x29, 0x21,
+		0x01, 0x00, 0x29, 0x21, 0x01, 0x00, 0x29, 0x21, 0x03, 0x00, 0xa0, 0x10,
+		0x01, 0x00, 0x29, 0x21, 0x01, 0x00, 0x29, 0x21, 0x01, 0x00, 0x29, 0x21
+	};
+	unsigned int tests_s_branch_bin_len = 48;
+
+
+Once I have these header files that contain the programs, I load them into
+memory as you would do by simply running the InitComputer function. I can
+then run the program however I want and verify the output programmatically by
+checking the actual registers, control signals, and memory of the simulation.
+
+One good example of this strategy is in tests/runtime_test.c where I test a
+MIPS implementation of a recursive fibonacci function against a equivalent C
+implementation. My strategy let me load whatever value I wanted into the
+argument register and then afterward verify that the return value register had
+the expected value. The biggest benefit here was that I could test many
+different edge cases in a matter of seconds with complete reproducibility.
+
+This strategy was used because the alternative of verifying a program's
+correctness using only it's standard out is a bad way to write software. Yet,
+every professor still does this and it is probably how this assignment will be
+graded even though it is hardly ever fair to students who's work is correct but
+has the wrong white-space characters.

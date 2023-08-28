@@ -1,0 +1,8 @@
+# Testing library
+tests/utest
+
+# Editor config
+.vscode/
+
+# Build
+*.o
